@@ -15,8 +15,8 @@ class BookApp(ctk.CTk):
 
         # Filter dropdown
         self.filter_option = ctk.CTkOptionMenu(
-            self, 
-            values=["all", "want", "reading", "finished"], 
+            self,
+            values=["all", "want", "reading", "finished"],
             command=self.apply_filter
         )
         self.filter_option.set("all")
@@ -39,62 +39,87 @@ class BookApp(ctk.CTk):
         self.rating_slider.pack(pady=5)
 
         # Add book button
-        self.button_add = ctk.CTkButton(self, text="Add Book", command=self.add_book)
+        self.button_add = ctk.CTkButton(self, text="Add New Book", command=self.open_add_book_editor)
         self.button_add.pack(pady=5)
 
-        # Book list
-        self.book_listbox = ctk.CTkTextbox(self, width=580, height=250)
-        self.book_listbox.pack(pady=10)
-        self.book_listbox.bind("<ButtonRelease-1>", self.on_book_select)
-
-        # Review Label + Textbox
-        self.review_label = ctk.CTkLabel(self, text="Review (selected book)")
-        self.review_label.pack(pady=(10, 0))
-        self.review_textbox = ctk.CTkTextbox(self, height=100)
-        self.review_textbox.configure(state="disabled")
-        self.review_textbox.pack(pady=5)
-
-        # Save/Delete buttons
-        self.save_button = ctk.CTkButton(self, text="Save Changes", command=self.save_changes)
-        self.delete_button = ctk.CTkButton(self, text="Delete Book", command=self.delete_book)
-        self.save_button.pack(pady=5)
-        self.delete_button.pack(pady=5)
+        # Scrollable frame for book buttons
+        self.scroll_frame = ctk.CTkScrollableFrame(self, width=580, height=250)
+        self.scroll_frame.pack(pady=10)
 
         # Load all books initially
         self.display_books()
 
-    def add_book(self):
-        title = self.entry_title.get()
-        author = self.entry_author.get()
-        status = self.status_option.get()
-        rating = int(self.rating_slider.get())
+    def open_add_book_editor(self):
+        # Create a pop-up editor for adding a new book
+        editor = ctk.CTkToplevel(self)
+        editor.title("Add New Book")
+        editor.geometry("400x400")
 
-        if not title or not author:
-            return
+        # Title & author
+        title_entry = ctk.CTkEntry(editor)
+        title_entry.pack(pady=5)
+        title_entry.insert(0, "")
 
-        book = Book(
-            title=title,
-            author=author,
-            genre="Unknown",
-            status=status,
-            rating=rating,
-            review=""
-        )
-        session.add(book)
-        session.commit()
-        self.display_books()
-        self.entry_title.delete(0, 'end')
-        self.entry_author.delete(0, 'end')
+        author_entry = ctk.CTkEntry(editor)
+        author_entry.pack(pady=5)
+        author_entry.insert(0, "")
+
+        # Status
+        status_menu = ctk.CTkOptionMenu(editor, values=["want", "reading", "finished"])
+        status_menu.set("want")
+        status_menu.pack(pady=5)
+
+        # Rating
+        rating_slider = ctk.CTkSlider(editor, from_=0, to=5, number_of_steps=5)
+        rating_slider.set(0)
+        rating_slider.pack(pady=5)
+
+        # Review
+        review_box = ctk.CTkTextbox(editor, height=100)
+        review_box.pack(pady=5)
+
+        # Save button
+        def save_book():
+            title = title_entry.get()
+            author = author_entry.get()
+            status = status_menu.get()
+            rating = int(rating_slider.get())
+            review = review_box.get("1.0", "end").strip()
+
+            if title and author:
+                book = Book(
+                    title=title,
+                    author=author,
+                    genre="Unknown",
+                    status=status,
+                    rating=rating,
+                    review=review
+                )
+                session.add(book)
+                session.commit()
+                editor.destroy()
+                self.display_books()
+
+        # Save the new book
+        ctk.CTkButton(editor, text="Save New Book", command=save_book).pack(pady=5)
 
     def display_books(self, books=None):
-        self.book_listbox.delete("1.0", "end")
+        # Clear previous buttons
+        for widget in self.scroll_frame.winfo_children():
+            widget.destroy()
+
         if books is None:
             books = session.query(Book).all()
+
         for book in books:
-            self.book_listbox.insert(
-                "end",
-                f"{book.title} by {book.author} - [{book.status}] ({book.rating}/5)\n"
+            btn_text = f"{book.title} by {book.author} - [{book.status}] ({book.rating}/5)"
+            book_button = ctk.CTkButton(
+                self.scroll_frame,
+                text=btn_text,
+                command=lambda b=book: self.open_book_editor(b),
+                width=550
             )
+            book_button.pack(pady=3)
 
     def apply_filter(self, choice):
         if choice == "all":
@@ -103,37 +128,56 @@ class BookApp(ctk.CTk):
             books = session.query(Book).filter_by(status=choice).all()
         self.display_books(books)
 
-    def on_book_select(self, event=None):
-        try:
-            selected_text = self.book_listbox.get("sel.first", "sel.last")
-            title = selected_text.split(" by ")[0].strip()
-            book = session.query(Book).filter_by(title=title).first()
-            if book:
-                self.current_book = book
-                self.review_textbox.configure(state="normal")
-                self.review_textbox.delete("1.0", "end")
-                self.review_textbox.insert("1.0", book.review or "")
-                self.status_option.set(book.status)
-                self.rating_slider.set(book.rating)
-        except:
-            pass
+    def open_book_editor(self, book):
+        # Create a pop-up editor for the selected book
+        editor = ctk.CTkToplevel(self)
+        editor.title(f"Edit: {book.title}")
+        editor.geometry("400x400")
 
-    def save_changes(self):
-        if self.current_book:
-            self.current_book.review = self.review_textbox.get("1.0", "end").strip()
-            self.current_book.status = self.status_option.get()
-            self.current_book.rating = int(self.rating_slider.get())
+        # Title & author
+        title_entry = ctk.CTkEntry(editor)
+        title_entry.insert(0, book.title)
+        title_entry.pack(pady=5)
+
+        author_entry = ctk.CTkEntry(editor)
+        author_entry.insert(0, book.author)
+        author_entry.pack(pady=5)
+
+        # Status
+        status_menu = ctk.CTkOptionMenu(editor, values=["want", "reading", "finished"])
+        status_menu.set(book.status)
+        status_menu.pack(pady=5)
+
+        # Rating
+        rating_slider = ctk.CTkSlider(editor, from_=0, to=5, number_of_steps=5)
+        rating_slider.set(book.rating)
+        rating_slider.pack(pady=5)
+
+        # Review
+        review_box = ctk.CTkTextbox(editor, height=100)
+        review_box.insert("1.0", book.review or "")
+        review_box.pack(pady=5)
+
+        # Save button
+        def save_book():
+            book.title = title_entry.get()
+            book.author = author_entry.get()
+            book.status = status_menu.get()
+            book.rating = int(rating_slider.get())
+            book.review = review_box.get("1.0", "end").strip()
             session.commit()
+            editor.destroy()
             self.display_books()
 
-    def delete_book(self):
-        if self.current_book:
-            session.delete(self.current_book)
+        # Delete button
+        def delete_book():
+            session.delete(book)
             session.commit()
-            self.review_textbox.delete("1.0", "end")
-            self.review_textbox.configure(state="disabled")
-            self.current_book = None
+            editor.destroy()
             self.display_books()
+
+        ctk.CTkButton(editor, text="Save Changes", command=save_book).pack(pady=5)
+        ctk.CTkButton(editor, text="Delete Book", command=delete_book).pack(pady=5)
 
 
 if __name__ == "__main__":
