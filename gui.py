@@ -10,7 +10,7 @@ class BookApp(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("PlotTwist")
-        self.geometry("600x700")
+        self.geometry("500x500")
         self.current_book = None
 
         # Filter dropdown
