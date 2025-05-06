@@ -1,0 +1,108 @@
+/* Themes */
+
+.theme-picker > fieldset {
+    border: none;
+    display: flex;
+    gap: 2rem;
+    width: fit-content;
+    background: transparent;
+    padding: 1rem 3rem;
+    margin-inline: auto;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.theme-picker input[type="radio"] {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    outline-offset: 3px;
+    outline: 3px solid var(--radio-color, currentColor);
+    border-radius: 50%;
+}
+
+.theme-picker input[type="radio"]:checked {
+    background-color: var(--radio-color);
+}
+
+/*---====== Base Theme ======---*/
+
+.theme-picker input[type="radio"]#base {
+    --radio-color: grey;
+}
+
+:root:has(#base:checked) {
+    --first-color: #ffffff;
+    --title-color: #C3B8B8;
+    --text-color: #000000;
+    --body-color: #e9e1e1;
+    --container-color: #c6c6c6;
+    --border-color: #b4b4b4;
+}
+
+/*---====== Gothic Theme ======---*/
+
+.theme-picker input[type="radio"]#Cathedral {
+    --radio-color: black;
+}
+
+:root:has(#Cathedral:checked) {
+    --first-color: #221a32;
+    --title-color: #8470a1;
+    --text-color: #6d577c;
+    --body-color: #722549;
+    --container-color: #541533;
+    --border-color: #090408;
+}
+
+/*---====== Cottagecore Theme ======---*/
+.theme-picker input[type="radio"]#Shrooms {
+    --radio-color: red;
+}
+
+/*---====== Starry Theme ======---*/
+.theme-picker input[type="radio"]#Constant {
+    --radio-color: rgb(48, 25, 112);
+}
+
+/*---====== Ocean/Nautical Theme ======---*/
+.theme-picker input[type="radio"]#Wave {
+    --radio-color: rgb(36, 175, 166);
+}
+
+/*---====== Forest Theme ======---*/
+.theme-picker input[type="radio"]#Lost {
+    --radio-color: rgb(0, 128, 0);
+}
+
+/*---====== Scrapbooking Theme ======---*/
+.theme-picker input[type="radio"]#Tape {
+    --radio-color: rgb(190, 159, 138);
+}
+
+/*---====== Home ======---*/
+.home {
+    padding-block: 16rem 9rem;
+}
+
+.home__container {
+    grid-template-columns: 7fr 5fr;
+    align-items: center;
+}
+
+.home__subtitle {
+    font-size: var(--small-font-size);
+    font-weight: var(--weight-400);
+    letter-spacing: 0.25rem;
+    margin-bottom: 1.25rem;
+    display: block;
+}
+
+.home_title {
+    font-family: var(--second-font);
+    font-size: var(--big-font-size);
+    font-weight: var(--weight-900);
+}
+
+.home__title span {
+    color: var(--first-color);
+}
