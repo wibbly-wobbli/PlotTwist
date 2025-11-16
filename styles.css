@@ -1,3 +1,92 @@
+/*--====== Font Styles ======---*/
+/*--==== Google Fonts ====--*/
+@import url('https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,100..900;1,100..900&family=Tinos:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/*--==== Variables CSS ====--*/
+:root {
+    --header-height: 6rem;
+
+    /*--==== Font and typography ====--*/
+    /*.5rem = 8px | 1rem = 16px ...*/
+    --body-font: "Chivo", sans-serif ;
+    --second-font: "Tinos", serif;
+
+    --big-font-size: 4.5rem;
+    --h1-font-size: 3.75rem;
+    --h2-font-size: 1.75rem;
+    --h3-font-size: 1.5rem;
+    --normal-font-size: 1.125rem;
+    --small-font-size: 1rem;
+    --smaller-font-size: 0.875rem;
+
+    /*--==== Font weight ====--*/
+    --weight-300: 300;
+    --weight-400: 400;
+    --weight-500: 500;
+    --weight-600: 600;
+    --weight-700: 700;
+    --weight-900: 900;
+
+    /*--==== transition ====--*/
+    --transition: cubic-bezier(0.05, 0.2, 0.1, 1);
+
+    /*--==== border radius ====--*/
+    --radius: .5rem;
+
+    /*--==== z index ====--*/
+    --z-tooltip: 10;
+    --z-fixed: 100;
+}
+/*--==== Base ====--*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+input,
+textarea,
+body {
+    color: var(--text-color);
+    font-family: var(--body-font);
+    font-size: var(--normal-font-size);
+    font-weight: var(--weight-300);
+}
+
+body {
+    background-color: var(--body-color);
+}
+
+h1,
+h2,
+h3 {
+    color: var(--title-color);
+    font-weight: var(--weight-700);
+}
+
+ul {
+    list-style: none;
+}
+
+a { 
+    text-decoration: none;
+}
+
+p {
+    line-height: 1.67em;
+}
+
+img {
+    max-width: 100%;
+}
+
+textarea,
+input {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
 /* Themes */
 
 .theme-picker > fieldset {
@@ -32,7 +121,7 @@
 
 :root:has(#base:checked) {
     --first-color: #ffffff;
-    --title-color: #C3B8B8;
+    --title-color: #5e5e5e;
     --text-color: #000000;
     --body-color: #e9e1e1;
     --container-color: #c6c6c6;
@@ -84,6 +173,10 @@
     padding-block: 16rem 9rem;
 }
 
+.home {
+    background-color: var(--first-color);
+}
+
 .home__container {
     grid-template-columns: 7fr 5fr;
     align-items: center;
@@ -92,17 +185,13 @@
 .home__subtitle {
     font-size: var(--small-font-size);
     font-weight: var(--weight-400);
-    letter-spacing: 0.25rem;
-    margin-bottom: 1.25rem;
     display: block;
+    color: var(--text-color);
 }
 
-.home_title {
+.home__title {
     font-family: var(--second-font);
     font-size: var(--big-font-size);
     font-weight: var(--weight-900);
-}
-
-.home__title span {
-    color: var(--first-color);
+    color: var(--title-color);
 }
